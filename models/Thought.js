@@ -1,6 +1,6 @@
 const { Schema, model, Types } = require('mongoose');
 
-
+// In this file, I created two classes, one for reactions and one for Thoughts. They are both exported at the bottom of the file.
 const reactionSchema = new Schema(
     {
         reactionId: {
@@ -24,6 +24,7 @@ const reactionSchema = new Schema(
     },
 );
 
+// This is the model for the thoughts, to be used when querying.
 const thoughtSchema = new Schema(
     {
         thoughtText: {
@@ -50,7 +51,7 @@ const thoughtSchema = new Schema(
         id: false,
     }
 );
-
+// This creates a reaction count for each thought. This essentially connects the two models together, and lets the user know how many reactions one of their Thoughts has.
 thoughtSchema.virtual('reactionCount').get(function () {
     return `reactions: ${this.reactions.length}`;
     });
@@ -58,5 +59,5 @@ thoughtSchema.virtual('reactionCount').get(function () {
 const Thought = model('Thought', thoughtSchema);
 const Reaction = model('Reaction', reactionSchema);
 
-
+// here, both models are exported.
 module.exports = { Thought, Reaction};

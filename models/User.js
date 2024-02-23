@@ -1,6 +1,6 @@
 const { Schema, model } = require('mongoose');
 
-
+// Below is the model for what a User object will look like.
 const userSchema = new Schema(
     {
         username: {
@@ -38,7 +38,7 @@ const userSchema = new Schema(
         id: false,
     }
 );
-
+// This defines a friend count function that grows or shrinks as the user gains and loses friends.
 userSchema.virtual('friendCount').get(function () {
     return this.friends.length;
 });
