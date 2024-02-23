@@ -11,10 +11,10 @@ const {
 } = require('../controllers/user-controllers');
 
 router.route('/').get(getAllUser);
-router.route('/').get(createUser);
+router.route('/').put(createUser);
 
 router.route('/:id').get(getUserById);
-router.route('/:id').put(updateUserById);
+router.route('/:id').post(updateUserById);
 router.route('/:id').delete(deleteUserById);
 
 router.route('/:userId/friends/:friendId').put(createFriend);

@@ -22,21 +22,22 @@ const thoughtController = {
   // this creates a Thought
   createThought({ params, body }, res) {
     Thought.create(body)
-      .then(({ _id }) => {
-        // This adds thought to the appropriate User subdocument
-        return User.findOneAndUpdate(
+      .then(dbThoughtData => {
+        User.findOneAndUpdate(
           { _id: params.userId },
-          { $push: { thoughts: _id } },
+          { $push: { thoughts: dbThoughtData._id }},
           { new: true }
-        );
-      })
-      .then((dbUserData) => {
-        if (!dbUserData) {
-          return res.status(404).json({ message: "No user found with this id!" });
+        )
+      .then(dbUserData => {
+        if(!dbUserData) {
+          res.status(404).json({ message: "No user found with this Id" });
+          return;
         }
         res.json(dbUserData);
       })
-      .catch((err) => res.json(err));
+      .catch(err => res.status(500).json(err));
+    })
+    .catch(err => res.status(500).json(err));
   },
   // This is how a Reaction is created
   createReaction({ params, body }, res) {
@@ -60,28 +61,23 @@ const thoughtController = {
   // This removes a Thought by searching for the Id and deleting it
   deleteThought({ params }, res) {
     Thought.findOneAndDelete({ _id: params.thoughtId })
-      .then((deletedThought) => {
-        // if no thought
-        if (!deletedThought) {
-          return res.status(404).json({ message: "No thought with this id!" });
-        }
-
-        return User.findOneAndUpdate(
-          { _id: params.userId },
-          { $pull: { thoughts: params.thoughtId } },
-          { new: true }
-        );
+    .then(dbThoughtData => {
+      if(!dbThoughtData) {
+        res.status(404).json({ message: "No thought with that Id"});
+        return;
+      }
+      User.findOneAndUpdate(
+        { _id: params.userId },
+        { $pull: { thoughts: params.thoughtId }},
+        )
+      .then(() => {
+          res.status(200).json({ message: `Successfully deleted the thought from user id ${params.userId}` });
       })
-      .then((dbUserData) => {
-        if (!dbUserData) {
-          return res
-            .status(404)
-            .json({ message: "No User found with this id!" });
-        }
-        res.json(dbUserData);
-      })
-      .catch((err) => res.json(err));
+      .catch(err => res.status(500).json(err));
+    })  
+    .catch(err => res.status(500).json(err));
   },
+  
   // This deletes a reaction
   deleteReaction({ params }, res) {
     Thought.findOneAndUpdate(
